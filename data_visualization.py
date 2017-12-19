@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
 
@@ -7,55 +6,33 @@ style.use('ggplot')
 
 file_path = '/Users/dheerajpatel/Documents/spotmentor/SOTC_data/Book10.xlsx'
 df = pd.read_excel(file_path)
-df = df.rename(columns={'Total Exp':'Experience', 'Emp ID':'ID',
-						'Functional Appraiser':'Appraiser', 'ZBO Dept':'zbo'})
 
-#getting years of experience in years only
-def cleanExp(experience):  
+# Renaming different columns for future use
+df.rename(columns={'Total Exp':'Experience', 'Emp ID':'ID',
+					'Functional Appraiser':'Appraiser', 'ZBO Dept':'zbo'}, inplace=True)
+
+# Getting years of experience in years only
+def cleanExp(experience):
     experience = experience.split()
     experience = map(lambda t : t.strip() , experience)
     experience = filter(lambda t : t.isdigit(), experience)
 
     return float(experience[0])+float(experience[1])/12
 
+# Cleaning different columns from DataFrame
 df['Experience'] = df['Experience'].map(cleanExp)
+df['Role'] = df['Designation'].map(lambda Designation:Designation.split('-')[0].strip())
+df['Department'] = df['Department'].map(lambda Department:Department.split('-')[0].strip())
+df['Location'] = df['Location'].map(lambda location:location.split('IN:',2)[1].split('-')[0].strip())
+df['zbo'] = df['zbo'].map(lambda dept:dept.split('-')[-1])
 
-
-def process_designation(df):
-	
-	df['Role'] = df['Designation'].map(lambda Designation:Designation.split('-')[0].strip())
-	
-process_designation(df)
-
-
-def process_department(df):
-
-	df['Department'] = df['Department'].map(lambda Department:Department.split('-')[0].strip())
-	
-process_department(df)
-
-
+# Droping columns from DataFrame
 column_list = ['Designation','Employee Category','Functional Appraiser ID','Date of Birth','Date of join']
-def clean_dataframe(df):
-	
-	for column in column_list:
-		df.drop(column,inplace=True,axis=1)
-
-clean_dataframe(df)	
+for column in column_list:
+	df.drop(column, inplace=True, axis=1)
 
 
-def clean_location(df):
-
-	df['Location'] = df['Location'].map(lambda location:location.split('IN:',2)[1].split('-')[0].strip())
-	
-clean_location(df)
-
-
-def getting_zbo(df):
-	df['zbo'] = df['zbo'].map(lambda dept:dept.split('-')[-1])
-
-getting_zbo(df)
-
+# Getting count of Employees w.r.t. each Attributes
 role_name=[]
 role_count=[]
 
@@ -77,7 +54,9 @@ grade_count=[]
 appraiser_name=[]
 appraiser_count=[]
 
-def get_unique_name_and_count(column,uniquename,count):
+import ipdb;ipdb.set_trace()
+
+def get_unique_name_and_count(column, uniquename, count):
 
 	for i in range(len(df[column].unique())):
 		uniquename.append(str(df[column].unique()[i]))
@@ -161,43 +140,10 @@ def data_visualization():
 
 	plotting_barplot(location_name,location_count,'location')
 	plotting_barplot(role_name,role_count,'role')
-	plotting_barplot(department_name,department_count,'department')	
+	plotting_barplot(department_name,department_count,'department')
 	plotting_barplot(region_name,region_count,'region')
 	plotting_barplot(zone_name,zone_count,'zone')
 	plotting_barplot(grade_name,grade_count,'grades')
 	plotting_barplot(appraiser_name,appraiser_count,'appraiser')
 
 data_visualization()
-
-'''
-preparation of data for further modeling
-since we have to use only numerical values
-for different operations like ML, NLP and various models
-'''
-global df
-def get_column_dummy(column,DataFrame):
-	
-	dummies = pd.get_dummies(DataFrame[column],prefix=column)
-	DataFrame = pd.concat([df,dummies],axis=1)
-	DataFrame.drop(column,axis=1,inplace=True)
-	return DataFrame
-
-df = get_column_dummy('Gender',df)
-
-df = get_column_dummy('Zone',df)
-
-df = get_column_dummy('Region',df)
-
-df = get_column_dummy('Department',df)
-
-df = get_column_dummy('Location',df)
-
-df = get_column_dummy('zbo',df)
-
-df = get_column_dummy('Grade',df)
-
-df = get_column_dummy('Role',df)
-
-column_list = ['ID','Name','Unit','Appraiser','Age Group']
-clean_dataframe(df)
-
