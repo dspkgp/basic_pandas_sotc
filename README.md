@@ -1,6 +1,7 @@
 # basic_pandas_sotc
 
 A simple representation of data handling, preparation and manipulation
+
 Visualising different aspect of the data
 
 #Libraries used:
