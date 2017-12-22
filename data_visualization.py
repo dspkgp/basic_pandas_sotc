@@ -5,8 +5,8 @@ from matplotlib import style
 
 style.use('ggplot')
 
-filepath = os.getcwd() + '\Book10.xlsx'
-df = pd.read_excel(filepath)
+filepath = os.getcwd() + '\Book10.csv'
+df = pd.read_csv(filepath)
 
 # Renaming different columns for future use
 df.rename(columns={'Total Exp':'Experience', 'Emp ID':'ID',
